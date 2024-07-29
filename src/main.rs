@@ -23,6 +23,7 @@ Options:
 ";
 const VERSION: &str = "0.0.1";
 
+#[cfg(any(target_os = "linux"))]
 fn main() {
     // Initialize the logger
     pretty_env_logger::init();

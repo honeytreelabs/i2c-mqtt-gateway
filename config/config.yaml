@@ -1,0 +1,6 @@
+---
+mqtt:
+  credentials:
+    user: user
+    password: password
+inputs: []

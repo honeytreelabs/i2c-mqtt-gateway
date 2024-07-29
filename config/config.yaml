@@ -7,4 +7,16 @@ mqtt:
   credentials:
     user: user
     password: password
-inputs: []
+ios:
+  inputs:
+    - address: 0x20
+      chip: PCF8574
+      # has 8 digital inputs (implicitly)
+    - address: 0x38
+      chip: PCF8574
+  outputs:
+    - address: 0x39
+      chip: PCF8574
+      # has 8 digital outputs (implicitly)
+    - address: 0x3a
+      chip: MAX7311

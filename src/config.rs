@@ -8,6 +8,7 @@ use anyhow::{Context, Result};
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub mqtt: Mqtt,
+    pub ios: IOs,
 }
 
 #[derive(Debug, Deserialize)]
@@ -27,6 +28,18 @@ pub struct Connection {
 pub struct Credentials {
     pub user: String,
     pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct IOs {
+    pub inputs: Vec<IO>,
+    pub outputs: Vec<IO>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct IO {
+    pub address: u8,
+    pub chip: String,
 }
 
 pub trait ConfigParser {
@@ -103,6 +116,15 @@ mqtt:
   credentials:
     user: "user"
     password: "pass"
+ios:
+  inputs:
+    - address: 0x20
+      chip: PCF8574
+  outputs:
+    - address: 0x21
+      chip: MAX7311
+    - address: 0x22
+      chip: PCF8574
 "#;
 
         let result = yaml_str.parse_config();

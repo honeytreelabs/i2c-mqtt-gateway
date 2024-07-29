@@ -1,10 +1,11 @@
 mod config;
 
-use config::{Config, ConfigParser};
+use config::{Config, ConfigParser, IOs};
 use docopt::Docopt;
 use std::env::args;
 use std::path::Path;
 use std::process;
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
@@ -60,17 +61,19 @@ fn main() {
         );
     let (client, connection) = Client::new(mqttoptions, 10);
 
-    thread::spawn(move || process(connection));
-    thread::spawn(move || publish(client));
-
-    println!("Done with the stream!!");
+    thread::spawn(move || notify_cb(connection));
+    let ios = Arc::new(config.ios);
+    let ios_clone_1 = Arc::clone(&ios);
+    thread::spawn(move || mqtt_worker(client, &ios_clone_1));
+    let ios_clone_2 = Arc::clone(&ios);
+    thread::spawn(move || i2c_worker(&ios_clone_2));
 
     loop {
         thread::park();
     }
 }
 
-fn process(mut connection: Connection) {
+fn notify_cb(mut connection: Connection) {
     for (i, notification) in connection.iter().enumerate() {
         match notification {
             Ok(notif) => {
@@ -84,20 +87,31 @@ fn process(mut connection: Connection) {
     }
 }
 
-/*
- * This is a helper function for publishing MQTT messages. In this function, we first sleep
- * for one second, then subscribe to a topic. Then we loop and send ten messages with lengths
- * ranging from 0 to 9, with each message's QoS being at least once.
- */
-fn publish(client: Client) {
+fn mqtt_worker(client: Client, ios: &Arc<IOs>) {
     // Wait for one second before subscribing to a topic
     thread::sleep(Duration::from_secs(1));
     client.subscribe("hello/+/world", QoS::AtMostOnce).unwrap();
 
     // Send ten messages with lengths ranging from 0 to 9, each message's QoS being at least once
-    for i in 0..10_usize {
-        let payload = vec![1; i];
+    for (i, input) in ios.inputs.iter().enumerate() {
+        let payload = format!(
+            "Input -- Address: 0x{:02x}, Chip:{}",
+            input.address, input.chip
+        );
         let topic = format!("hello/{i}/world");
+        println!("Publishing '{}' to topic '{}'", payload, topic);
+        let qos = QoS::AtLeastOnce;
+
+        client.publish(topic, qos, true, payload).unwrap();
+    }
+
+    for (i, output) in ios.outputs.iter().enumerate() {
+        let payload = format!(
+            "Output -- Address: 0x{:02x}, Chip:{}",
+            output.address, output.chip
+        );
+        let topic = format!("hello/{i}/world");
+        println!("Publishing '{}' to topic '{}'", payload, topic);
         let qos = QoS::AtLeastOnce;
 
         client.publish(topic, qos, true, payload).unwrap();
@@ -105,3 +119,5 @@ fn publish(client: Client) {
 
     thread::sleep(Duration::from_secs(1));
 }
+
+fn i2c_worker(_ios: &Arc<IOs>) {}

@@ -11,6 +11,10 @@ target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-bridge:
 		cargo build --$(PROFILE) --target armv7-unknown-linux-musleabihf; \
 	fi
 
+.PHONY: test
+test:
+	cargo test -- --nocapture
+
 .PHONY: clean
 clean:
 	-rm -rf target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-bridge

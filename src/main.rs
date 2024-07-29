@@ -1,8 +1,9 @@
 mod config;
 
-use config::{parse_config, Config};
+use config::{Config, ConfigParser};
 use docopt::Docopt;
 use std::env::args;
+use std::path::Path;
 use std::process;
 use std::thread;
 use std::time::Duration;
@@ -36,9 +37,7 @@ fn main() {
         process::exit(0);
     }
     let file_path = args.get_str("<config-file>");
-
-    // Parse the YAML file directly from the reader
-    let config: Config = match parse_config(file_path) {
+    let config: Config = match Path::new(file_path).parse_config() {
         Ok(config) => config,
         Err(e) => {
             eprintln!("Error parsing config file: {}", e);

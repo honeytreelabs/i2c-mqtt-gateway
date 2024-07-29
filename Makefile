@@ -15,6 +15,9 @@ target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-bridge:
 test:
 	cargo test -- --nocapture
 
+deploy: target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-bridge
+	scp -O $< raspberry:/tmp
+
 .PHONY: clean
 clean:
 	-rm -rf target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-bridge

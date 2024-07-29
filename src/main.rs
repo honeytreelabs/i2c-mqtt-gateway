@@ -1,24 +1,40 @@
 mod config;
 
 use config::{parse_config, Config};
-use std::env;
+use docopt::Docopt;
+use std::env::args;
 use std::process;
 use std::thread;
 use std::time::Duration;
 
 use rumqttc::{Client, Connection, LastWill, MqttOptions, QoS};
 
+const USAGE: &str = "
+Expose I2C devices to Home Assistant via MQTT.
+
+Usage:
+  i2c-mqtt-bridge <config-file>
+  i2c-mqtt-bridge (-h | --help)
+  i2c-mqtt-bridge --version
+
+Options:
+  -h --help    Show this help text.
+  --version    Show version.
+";
+const VERSION: &str = "0.0.1";
+
 fn main() {
     // Initialize the logger
     pretty_env_logger::init();
 
-    let args = env::args().collect::<Vec<String>>();
-    if args.len() != 2 {
-        eprintln!("Usage: {} <path_to_config>", args[0]);
-        process::exit(1);
+    let args = Docopt::new(USAGE)
+        .and_then(|d| d.argv(args()).parse())
+        .unwrap_or_else(|e| e.exit());
+    if args.get_bool("--version") {
+        println!("i2c-mqtt-bridge version: {}", VERSION);
+        process::exit(0);
     }
-
-    let file_path = &args[1];
+    let file_path = args.get_str("<config-file>");
 
     // Parse the YAML file directly from the reader
     let config: Config = match parse_config(file_path) {

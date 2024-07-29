@@ -12,7 +12,15 @@ pub struct Config {
 
 #[derive(Debug, Deserialize)]
 pub struct Mqtt {
+    pub connection: Connection,
     pub credentials: Credentials,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Connection {
+    pub host: String,
+    pub port: u16,
+    pub id: String,
 }
 
 #[derive(Debug, Deserialize)]

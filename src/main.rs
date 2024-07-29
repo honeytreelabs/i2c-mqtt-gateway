@@ -46,7 +46,11 @@ fn main() {
         }
     };
 
-    let mut mqttoptions = MqttOptions::new("test-1", "raspberry-s.lan", 11883);
+    let mut mqttoptions = MqttOptions::new(
+        config.mqtt.connection.id,
+        config.mqtt.connection.host,
+        config.mqtt.connection.port,
+    );
     let will = LastWill::new("hello/world", "good bye", QoS::AtMostOnce, false);
     mqttoptions
         .set_keep_alive(Duration::from_secs(5))

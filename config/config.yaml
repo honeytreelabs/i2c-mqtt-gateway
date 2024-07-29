@@ -1,5 +1,9 @@
 ---
 mqtt:
+  connection:
+    host: broker.lan
+    port: 1883
+    id: some-id
   credentials:
     user: user
     password: password

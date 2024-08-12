@@ -1,5 +1,5 @@
 [package]
-name = "i2c-mqtt-bridge"
+name = "i2c-mqtt-gateway"
 version = "0.1.0"
 edition = "2021"
 
@@ -15,7 +15,7 @@ i2cdev = "0.6.1"
 docopt = "1"
 
 [[bin]]
-name = "i2c-mqtt-bridge"
+name = "i2c-mqtt-gateway"
 path = "src/main.rs"
 
 [profile.release]

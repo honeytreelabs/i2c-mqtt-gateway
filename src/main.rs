@@ -14,9 +14,9 @@ const USAGE: &str = "
 Expose I2C devices to Home Assistant via MQTT.
 
 Usage:
-  i2c-mqtt-bridge <config-file>
-  i2c-mqtt-bridge (-h | --help)
-  i2c-mqtt-bridge --version
+  i2c-mqtt-gateway <config-file>
+  i2c-mqtt-gateway (-h | --help)
+  i2c-mqtt-gateway --version
 
 Options:
   -h --help    Show this help text.
@@ -33,7 +33,7 @@ fn main() {
         .and_then(|d| d.argv(args()).parse())
         .unwrap_or_else(|e| e.exit());
     if args.get_bool("--version") {
-        println!("i2c-mqtt-bridge version: {}", VERSION);
+        println!("i2c-mqtt-gateway version: {}", VERSION);
         process::exit(0);
     }
     let file_path = args.get_str("<config-file>");

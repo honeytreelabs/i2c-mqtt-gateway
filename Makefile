@@ -19,6 +19,10 @@ target/$(PROFILE)/i2c-mqtt-gateway:
 		cargo build --$(PROFILE); \
 	fi
 
+.PHONY: run
+run:
+	cargo run config/config.yaml
+
 .PHONY: test
 test:
 	cargo test -- --nocapture
@@ -32,8 +36,10 @@ deploy: target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-gateway
 
 .PHONY: clean
 clean:
-	-rm -rf target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-gateway
+	-rm -f target/armv7-unknown-linux-musleabihf/$(PROFILE)/i2c-mqtt-gateway
+	-rm -f target/debug/i2c-mqtt-gateway target/release/i2c-mqtt-gateway
 
 .PHONY: distclean
 distclean:
 	-rm -rf target/armv7-unknown-linux-musleabihf/
+	-rm -rf target/debug target/release

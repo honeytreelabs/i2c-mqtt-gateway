@@ -8,6 +8,7 @@ use anyhow::{Context, Result};
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub mqtt: Mqtt,
+    pub i2c: I2C,
     pub ios: IOs,
 }
 
@@ -15,6 +16,16 @@ pub struct Config {
 pub struct Mqtt {
     pub connection: Connection,
     pub credentials: Credentials,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct I2C {
+    #[serde(default = "default_i2c_path")]
+    pub device: String,
+}
+
+fn default_i2c_path() -> String {
+    "/dev/i2c-1".to_string()
 }
 
 #[derive(Debug, Deserialize)]
@@ -40,6 +51,8 @@ pub struct IOs {
 pub struct IO {
     pub address: u8,
     pub chip: String,
+    #[serde(default)]
+    pub pins: Vec<String>,
 }
 
 pub trait ConfigParser {
@@ -51,6 +64,8 @@ impl ConfigParser for &str {
         let config: Config = serde_yaml::from_str(self)
             .with_context(|| format!("Failed to parse YAML document: \n{}", self))?;
 
+        // TODO perform input validation
+        // - IOs must have unique names
         Ok(config)
     }
 }
@@ -116,15 +131,22 @@ mqtt:
   credentials:
     user: "user"
     password: "pass"
+i2c:
+  device: /dev/i2c-0
 ios:
   inputs:
-    - address: 0x20
-      chip: PCF8574
+  - address: 0x20
+    chip: PCF8574
+    pins: []
   outputs:
-    - address: 0x21
-      chip: MAX7311
-    - address: 0x22
-      chip: PCF8574
+  - address: 0x21
+    chip: MAX7311
+    pins:
+      - one
+      - two
+      - three
+  - address: 0x22
+    chip: PCF8574
 "#;
 
         let result = yaml_str.parse_config();

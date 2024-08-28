@@ -7,16 +7,26 @@ mqtt:
   credentials:
     user: user
     password: password
+i2c:
+  device: /dev/i2c-1
 ios:
   inputs:
-    - address: 0x20
-      chip: PCF8574
-      # has 8 digital inputs (implicitly)
-    - address: 0x38
-      chip: PCF8574
+  - address: 0x20  # has 8 digital inputs (implicitly)
+    chip: PCF8574
+    pins:
+    - bedroom
+    - living_room
+  - address: 0x38
+    chip: PCF8574
+    pins:
+    - button_one_up
+    - button_one_down
   outputs:
-    - address: 0x39
-      chip: PCF8574
-      # has 8 digital outputs (implicitly)
-    - address: 0x3a
-      chip: MAX7311
+  - address: 0x39  # has 8 digital outputs (implicitly)
+    chip: MAX7311
+    pins: []
+  - address: 0x3a
+    chip: PCF8574
+    pins:
+    - blind_one_up
+    - blind_one_down

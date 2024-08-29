@@ -89,7 +89,7 @@ impl I2CDeviceTree {
 pub struct PCF8574Output {
     address: u8,
     states: u8,
-    dirty: Mutex<bool>,
+    dirty: bool,
 }
 
 impl PCF8574Output {
@@ -97,7 +97,7 @@ impl PCF8574Output {
         PCF8574Output {
             address: addr,
             states: 0,
-            dirty: Mutex::new(false),
+            dirty: false,
         }
     }
 }
@@ -108,8 +108,7 @@ impl I2COutput for PCF8574Output {
             "Writing value '0x{:02X}' to {:02X}",
             self.states, self.address
         );
-        let mut dirty = self.dirty.lock().unwrap();
-        *dirty = false;
+        self.dirty = false;
     }
 
     fn set_at(&mut self, pos: usize, value: bool) {
@@ -123,13 +122,11 @@ impl I2COutput for PCF8574Output {
             self.states &= !(1 << pos);
         }
 
-        let mut dirty = self.dirty.lock().unwrap();
-        *dirty = true;
+        self.dirty = true;
     }
 
     fn is_dirty(&self) -> bool {
-        let dirty = self.dirty.lock().unwrap();
-        *dirty
+        self.dirty
     }
 }
 

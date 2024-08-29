@@ -172,7 +172,6 @@ fn notify_cb(
             };
 
             device_tree.update(output_name, s);
-            // publish to MQTT state topic that output state has changed
             sender
                 .send(StateChange {
                     io_name: output_name.to_string(),

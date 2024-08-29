@@ -40,7 +40,7 @@ impl I2CDeviceTree {
         };
         for input in &config.ios.inputs {
             let device: Arc<Mutex<dyn I2CInput>> = match input.chip.as_str() {
-                "PCF8574" => Arc::new(Mutex::new(PCF8574::new(input.address))),
+                "PCF8574" => Arc::new(Mutex::new(PCF8574Input::new(input.address))),
                 _ => {
                     println!("Unknown chip '{}'", input.chip);
                     continue;
@@ -59,7 +59,7 @@ impl I2CDeviceTree {
         }
         for output in &config.ios.outputs {
             let device: Arc<Mutex<dyn I2COutput>> = match output.chip.as_str() {
-                "PCF8574" => Arc::new(Mutex::new(PCF8574::new(output.address))),
+                "PCF8574" => Arc::new(Mutex::new(PCF8574Output::new(output.address))),
                 _ => continue,
             };
             for (p, pin) in output.pins.iter().enumerate() {
@@ -86,15 +86,15 @@ impl I2CDeviceTree {
     }
 }
 
-pub struct PCF8574 {
+pub struct PCF8574Output {
     address: u8,
     states: u8,
     dirty: Mutex<bool>,
 }
 
-impl PCF8574 {
+impl PCF8574Output {
     pub fn new(addr: u8) -> Self {
-        PCF8574 {
+        PCF8574Output {
             address: addr,
             states: 0,
             dirty: Mutex::new(false),
@@ -102,14 +102,7 @@ impl PCF8574 {
     }
 }
 
-impl I2CInput for PCF8574 {
-    fn read(&self) {}
-    fn state(&self) -> bool {
-        true
-    }
-}
-
-impl I2COutput for PCF8574 {
+impl I2COutput for PCF8574Output {
     fn write(&mut self) {
         println!(
             "Writing value '0x{:02X}' to {:02X}",
@@ -137,5 +130,22 @@ impl I2COutput for PCF8574 {
     fn is_dirty(&self) -> bool {
         let dirty = self.dirty.lock().unwrap();
         *dirty
+    }
+}
+
+pub struct PCF8574Input {
+    address: u8,
+}
+
+impl PCF8574Input {
+    pub fn new(addr: u8) -> Self {
+        PCF8574Input { address: addr }
+    }
+}
+
+impl I2CInput for PCF8574Input {
+    fn read(&self) {}
+    fn state(&self) -> bool {
+        true
     }
 }
